@@ -97,6 +97,8 @@ void CPU::handleALU() {
 				selectedRegister = nullptr;
 			}
 		}
+
+		updateLabel();
 	}
 }
 
@@ -165,7 +167,7 @@ void CPU::drawALU() {
 	drawing.drawRect(aLU.v_position + Vector2(12.5, 90), 175, 20, colorRegister);
 	drawing.drawRectOutline(aLU.v_position + Vector2(12.5, 90), 175, 20);
 
-	drawing.drawText(setupLabel(), aLU.v_position + Vector2(100, 100), 1);
+	drawing.drawText(aLU.label.c_str(), aLU.v_position + Vector2(100, 100), 1);
 
 	if (aLU.instruction == 0) { drawing.drawRect(aLU.v_position + Vector2(10, 120), 40, 20, colorRegisterSelected); }
 	else { drawing.drawRect(aLU.v_position + Vector2(10, 120), 40, 20, colorRegister); }
@@ -178,14 +180,17 @@ void CPU::drawALU() {
 	drawing.drawText("sub", aLU.v_position + Vector2(80, 130), 1);
 }
 
-const char* CPU::setupLabel() {
-	std::string label;
+void CPU::updateLabel() {
+	aLU.label.clear();
 
 	switch (aLU.instruction) {
-		case 0: label += "add"; break;
-		case 1: label += "sub"; break;
+		case 0: aLU.label += "add"; break;
+		case 1: aLU.label += "sub"; break;
 	}
 
-	if (label.empty()) { label = " "; }
-	return label.c_str();
+	if (aLU.r3 != nullptr) { aLU.label += " r"; aLU.label.push_back(findIndexOfRegister(aLU.r3) + '0'); aLU.label += " "; }
+	if (aLU.r1 != nullptr) { aLU.label += " r"; aLU.label.push_back(findIndexOfRegister(aLU.r1) + '0'); aLU.label += " "; }
+	if (aLU.r2 != nullptr) { aLU.label += " r"; aLU.label.push_back(findIndexOfRegister(aLU.r2) + '0'); aLU.label += " "; }
+
+	if (aLU.label.empty()) { aLU.label = " "; }
 }

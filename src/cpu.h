@@ -26,6 +26,7 @@ struct ALU {
 
 	Vector2 v_position;
 	int v_width = 200, v_height = 150;
+	std::string label = " ";
 };
 
 class CPU {
@@ -41,7 +42,7 @@ private:
 	int findIndexOfRegister(char* data);
 
 	void resetRegisters();
-	const char* setupLabel();
+	void updateLabel();
 
 	void handleInternalMemory();
 	char* getClickInternalMemory();
