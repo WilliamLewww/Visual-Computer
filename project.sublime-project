@@ -1,0 +1,73 @@
+{
+	"build_systems":
+	[
+		{
+			"cmd":
+			[
+				"g++",
+				"C:/Projects/Visual-Computer/main.cpp",
+				"-o",
+				"C:/Projects/Visual-Computer/VC",
+				"C:/Projects/Visual-Computer/engine.cpp",
+				"C:/Projects/Visual-Computer/src/*.cpp",
+				"C:/Projects/Visual-Computer/src/core/*.cpp",
+				"-IC:/Libraries/SDL2-2.0.8-mingw/i686-w64-mingw32/include",
+				"-LC:/Libraries/SDL2-2.0.8-mingw/i686-w64-mingw32/lib",
+				"-IC:/Libraries/bass24/c",
+				"-LC:/Libraries/bass24/c",
+				"-IC:/Libraries/bass_fx24/C",
+				"-LC:/Libraries/bass_fx24/C",
+				"-lbass",
+				"-lbass_fx",
+				"-lmingw32",
+				"-lSDL2main",
+				"-lSDL2",
+				"-lopengl32",
+				"-lws2_32",
+				"-lSDL2_ttf",
+				"&&",
+				"C:/Projects/Visual-Computer/VC"
+			],
+			"file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+			"name": "Visual-Computer",
+			"selector": "source.c, source.c++",
+			"variants":
+		    [
+		        {
+		            "name": "Compile Client",
+		            "cmd": [
+		            	"g++",
+						"C:/Projects/Visual-Computer/main.cpp",
+						"-o",
+						"C:/Projects/Visual-Computer/VC",
+						"C:/Projects/Visual-Computer/engine.cpp",
+						"C:/Projects/Visual-Computer/src/*.cpp",
+						"C:/Projects/Visual-Computer/src/core/*.cpp",
+						"-IC:/Libraries/SDL2-2.0.8-mingw/i686-w64-mingw32/include",
+						"-LC:/Libraries/SDL2-2.0.8-mingw/i686-w64-mingw32/lib",
+						"-IC:/Libraries/bass24/c",
+						"-LC:/Libraries/bass24/c",
+						"-IC:/Libraries/bass_fx24/C",
+						"-LC:/Libraries/bass_fx24/C",
+						"-lbass",
+						"-lbass_fx",
+						"-lmingw32",
+						"-lSDL2main",
+						"-lSDL2",
+						"-lopengl32",
+						"-lws2_32",
+						"-lSDL2_ttf",
+					]
+		        }
+		    ],
+			"shell": true,
+			"working_dir": "${file_path}"
+		}
+	],
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	]
+}
