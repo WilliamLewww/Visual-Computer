@@ -7,7 +7,7 @@ void Joiner::initialize() {
 }
 
 void Joiner::update() {
-	
+	cPU.update();
 }
 
 void Joiner::draw() {
