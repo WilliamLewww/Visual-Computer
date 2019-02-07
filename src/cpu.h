@@ -10,12 +10,22 @@ enum INSTRUCTIONS {
 	INSTRUCTIONS_SUB = 2
 };
 
+struct RegisterContainer {
+	Vector2 v_position;
+	int v_width = 75, v_height = 20;
+
+	char *data = nullptr;
+	std::string label = " ";
+};
+
 struct InternalMemory {
 	int registerCount;
 	char *registers;
 
 	Vector2 v_position;
 	int v_width = 75, v_height = 290;
+
+	RegisterContainer* registerContainer;
 };
 
 struct ALU {
@@ -27,6 +37,8 @@ struct ALU {
 	Vector2 v_position;
 	int v_width = 200, v_height = 150;
 	std::string label = " ";
+
+	RegisterContainer* registerContainer;
 };
 
 class CPU {
@@ -39,10 +51,13 @@ private:
 	Vector2 v_position;
 	int v_width = 300, v_height = 300;
 
+	float velocityX, velocityY;
+
 	int findIndexOfRegister(char* data);
+	void linkRegisterContainer(RegisterContainer* registerContainer, char* data);
 
 	void resetRegisters();
-	void updateLabel();
+	void updateLabelALU();
 
 	void handleInternalMemory();
 	char* getClickInternalMemory();
@@ -58,4 +73,5 @@ public:
 	void draw();
 	void drawInternalMemory();
 	void drawALU();
+	void drawRegisterContainer(RegisterContainer* registerContainer);
 };

@@ -15,6 +15,27 @@ const char* convertCharToHex(char* data) {
 	return stream.str().c_str();
 }
 
+CPU::CPU() {
+	v_position = Vector2(50, 50);
+
+	internalMemory.registerCount = 10;
+	internalMemory.registers = new char[internalMemory.registerCount];
+	resetRegisters();
+
+	internalMemory.registerContainer = new RegisterContainer[internalMemory.registerCount];
+	internalMemory.v_position = v_position + Vector2(220, 5);
+	for (int x = 0; x < internalMemory.registerCount; x++) {
+		linkRegisterContainer(&internalMemory.registerContainer[x], &internalMemory.registers[x]);
+		internalMemory.registerContainer[x].v_position = internalMemory.v_position + Vector2(0, 20 * x);
+	}
+
+	aLU.registerContainer = new RegisterContainer[3];
+	aLU.v_position = v_position + Vector2(110 - (aLU.v_width / 2), 145);
+	aLU.registerContainer[0].v_position = aLU.v_position + Vector2(10, 10);
+	aLU.registerContainer[1].v_position = aLU.v_position + Vector2(115, 10);
+	aLU.registerContainer[2].v_position = aLU.v_position + Vector2(62.5, 45);
+}
+
 int CPU::findIndexOfRegister(char* data) {
 	for (int x = 0; x < internalMemory.registerCount; x++) {
 		if (data == &internalMemory.registers[x]) {
@@ -25,12 +46,9 @@ int CPU::findIndexOfRegister(char* data) {
 	return -1;
 }
 
-CPU::CPU() {
-	v_position = Vector2(50, 50);
-
-	internalMemory.registerCount = 10;
-	internalMemory.registers = new char[internalMemory.registerCount];
-	resetRegisters();
+void CPU::linkRegisterContainer(RegisterContainer* registerContainer, char* data) {
+	registerContainer->data = data;
+	registerContainer->label = "$r" + std::to_string(findIndexOfRegister(data)) + ":";
 }
 
 void CPU::resetRegisters() {
@@ -47,6 +65,9 @@ void CPU::manipulateALU() {
 void CPU::update() {
 	handleInternalMemory();
 	handleALU();
+
+	v_position.x += velocityX;
+	v_position.y += velocityY;
 }
 
 void CPU::handleInternalMemory() {
@@ -78,27 +99,37 @@ void CPU::handleALU() {
 			aLU.instruction = 1;
 		}
 
-		if (selectedRegister != nullptr) {
-			if (input.getMouseX() > aLU.v_position.x + 10 && input.getMouseX() < aLU.v_position.x + 85 &&
-				input.getMouseY() > aLU.v_position.y + 10 && input.getMouseY() < aLU.v_position.y + 30) {
+		if (input.getMouseX() > aLU.v_position.x + 10 && input.getMouseX() < aLU.v_position.x + 85 &&
+			input.getMouseY() > aLU.v_position.y + 10 && input.getMouseY() < aLU.v_position.y + 30) {
+			if (selectedRegister != nullptr) {
 				aLU.r1 = selectedRegister;
+				linkRegisterContainer(&aLU.registerContainer[0], aLU.r1);
 				selectedRegister = nullptr;
 			}
-
-			if (input.getMouseX() > aLU.v_position.x + 115 && input.getMouseX() < aLU.v_position.x + 190 &&
-				input.getMouseY() > aLU.v_position.y + 10 && input.getMouseY() < aLU.v_position.y + 30) {
-				aLU.r2 = selectedRegister;
-				selectedRegister = nullptr;
-			}
-
-			if (input.getMouseX() > aLU.v_position.x + 62.5 && input.getMouseX() < aLU.v_position.x + 137.5 &&
-				input.getMouseY() > aLU.v_position.y + 45 && input.getMouseY() < aLU.v_position.y + 65) {
-				aLU.r3 = selectedRegister;
-				selectedRegister = nullptr;
-			}
+			else { aLU.r1 = nullptr; aLU.registerContainer[0].data = nullptr; }
 		}
 
-		updateLabel();
+		if (input.getMouseX() > aLU.v_position.x + 115 && input.getMouseX() < aLU.v_position.x + 190 &&
+			input.getMouseY() > aLU.v_position.y + 10 && input.getMouseY() < aLU.v_position.y + 30) {
+			if (selectedRegister != nullptr) {
+				aLU.r2 = selectedRegister;
+				linkRegisterContainer(&aLU.registerContainer[1], aLU.r2);
+				selectedRegister = nullptr;
+			}
+			else { aLU.r2 = nullptr; aLU.registerContainer[1].data = nullptr; }
+		}
+
+		if (input.getMouseX() > aLU.v_position.x + 62.5 && input.getMouseX() < aLU.v_position.x + 137.5 &&
+			input.getMouseY() > aLU.v_position.y + 45 && input.getMouseY() < aLU.v_position.y + 65) {
+			if (selectedRegister != nullptr) {
+				aLU.r3 = selectedRegister;
+				linkRegisterContainer(&aLU.registerContainer[2], aLU.r3);
+				selectedRegister = nullptr;
+			}	
+			else { aLU.r3 = nullptr; aLU.registerContainer[2].data = nullptr; }
+		}
+
+		updateLabelALU();
 	}
 }
 
@@ -110,59 +141,21 @@ void CPU::draw() {
 }
 
 void CPU::drawInternalMemory() {
-	internalMemory.v_position = v_position + Vector2(220, 5);
+	drawing.drawRect(internalMemory.v_position, internalMemory.v_width, internalMemory.v_height, colorRegisterNull);
 	drawing.drawRectOutline(internalMemory.v_position, internalMemory.v_width, internalMemory.v_height);
 
-	drawing.drawRect(internalMemory.v_position, internalMemory.v_width, internalMemory.v_height, colorRegisterNull);
-	for (int x = 1; x <= internalMemory.registerCount; x++) {
-		if (selectedRegister == &internalMemory.registers[x - 1]) {
-			drawing.drawRect(internalMemory.v_position + Vector2(0, 20 * (x - 1)), internalMemory.v_width, 20, colorRegisterSelected);
-		}
-		else {
-			drawing.drawRect(internalMemory.v_position + Vector2(0, 20 * (x - 1)), internalMemory.v_width, 20, colorRegister);
-		}
-		drawing.drawLine(internalMemory.v_position + Vector2(0, 20 * x), internalMemory.v_position + Vector2(internalMemory.v_width, 20 * x));
-
-		std::string label = "r" + std::to_string(x - 1) + ":";
-		drawing.drawText(label.c_str(), internalMemory.v_position + Vector2((internalMemory.v_width / 5), (20 * x) - 11), 1);
-		drawing.drawText(convertCharToHex(&internalMemory.registers[x - 1]), internalMemory.v_position + Vector2((internalMemory.v_width / 2) + 15, (20 * x) - 11), 1);
+	for (int x = 0; x < internalMemory.registerCount; x++) {
+		drawRegisterContainer(&internalMemory.registerContainer[x]);
 	}
 }
 
 void CPU::drawALU() {
-	aLU.v_position = v_position + Vector2(110 - (aLU.v_width / 2), 145);
 	drawing.drawRect(aLU.v_position, aLU.v_width, aLU.v_height, colorALU);
 	drawing.drawRectOutline(aLU.v_position, aLU.v_width, aLU.v_height);
 
-	if (aLU.r1 == nullptr) {  drawing.drawRect(aLU.v_position + Vector2(10, 10), 75, 20, colorALUNull); }
-	else { 
-		drawing.drawRect(aLU.v_position + Vector2(10, 10), 75, 20, colorRegister); 
-
-		std::string label = "r" + std::to_string(findIndexOfRegister(aLU.r1)) + ":";
-		drawing.drawText(label.c_str(), aLU.v_position + Vector2((internalMemory.v_width / 5) + 10, 30 - 11), 1);
-		drawing.drawText(convertCharToHex(aLU.r1), aLU.v_position + Vector2((internalMemory.v_width / 2) + 15 + 10, 30 - 11), 1);
-	}
-	drawing.drawRectOutline(aLU.v_position + Vector2(10, 10), 75, 20);
-
-	if (aLU.r2 == nullptr) { drawing.drawRect(aLU.v_position + Vector2(115, 10), 75, 20, colorALUNull); }
-	else { 
-		drawing.drawRect(aLU.v_position + Vector2(115, 10), 75, 20, colorRegister); 
-
-		std::string label = "r" + std::to_string(findIndexOfRegister(aLU.r2)) + ":";
-		drawing.drawText(label.c_str(), aLU.v_position + Vector2((internalMemory.v_width / 5) + 115, 30 - 11), 1);
-		drawing.drawText(convertCharToHex(aLU.r2), aLU.v_position + Vector2((internalMemory.v_width / 2) + 15 + 115, 30 - 11), 1);
-	}
-	drawing.drawRectOutline(aLU.v_position + Vector2(115, 10), 75, 20);
-
-	if (aLU.r3 == nullptr) { drawing.drawRect(aLU.v_position + Vector2(62.5, 45), 75, 20, colorALUNull); }
-	else { 
-		drawing.drawRect(aLU.v_position + Vector2(62.5, 45), 75, 20, colorRegister); 
-
-		std::string label = "r" + std::to_string(findIndexOfRegister(aLU.r3)) + ":";
-		drawing.drawText(label.c_str(), aLU.v_position + Vector2((internalMemory.v_width / 5) + 62.5, 65 - 11), 1);
-		drawing.drawText(convertCharToHex(aLU.r3), aLU.v_position + Vector2((internalMemory.v_width / 2) + 15 + 62.5, 65 - 11), 1);
-	}
-	drawing.drawRectOutline(aLU.v_position + Vector2(62.5, 45), 75, 20);
+	drawRegisterContainer(&aLU.registerContainer[0]);
+	drawRegisterContainer(&aLU.registerContainer[1]);
+	drawRegisterContainer(&aLU.registerContainer[2]);
 
 	drawing.drawRect(aLU.v_position + Vector2(12.5, 90), 175, 20, colorRegister);
 	drawing.drawRectOutline(aLU.v_position + Vector2(12.5, 90), 175, 20);
@@ -180,17 +173,39 @@ void CPU::drawALU() {
 	drawing.drawText("sub", aLU.v_position + Vector2(80, 130), 1);
 }
 
-void CPU::updateLabel() {
+void CPU::updateLabelALU() {
 	aLU.label.clear();
 
 	switch (aLU.instruction) {
-		case 0: aLU.label += "add"; break;
+		case 0: aLU.label += "add   "; break;
 		case 1: aLU.label += "sub"; break;
 	}
 
-	if (aLU.r3 != nullptr) { aLU.label += " r"; aLU.label.push_back(findIndexOfRegister(aLU.r3) + '0'); aLU.label += " "; }
-	if (aLU.r1 != nullptr) { aLU.label += " r"; aLU.label.push_back(findIndexOfRegister(aLU.r1) + '0'); aLU.label += " "; }
-	if (aLU.r2 != nullptr) { aLU.label += " r"; aLU.label.push_back(findIndexOfRegister(aLU.r2) + '0'); aLU.label += " "; }
+	bool addComma = false;
+
+	if (aLU.r3 != nullptr) { aLU.label += "$r"; aLU.label.push_back(findIndexOfRegister(aLU.r3) + '0'); addComma = true; }
+	if (addComma) { aLU.label += ","; addComma = false; }
+	if (aLU.r1 != nullptr) { aLU.label += "$r"; aLU.label.push_back(findIndexOfRegister(aLU.r1) + '0'); addComma = true; }
+	if (addComma) { aLU.label += ","; addComma = false; }
+	if (aLU.r2 != nullptr) { aLU.label += "$r"; aLU.label.push_back(findIndexOfRegister(aLU.r2) + '0'); }
 
 	if (aLU.label.empty()) { aLU.label = " "; }
+}
+
+void CPU::drawRegisterContainer(RegisterContainer* registerContainer) {
+	if (registerContainer->data == nullptr) {  drawing.drawRect(registerContainer->v_position, registerContainer->v_width, registerContainer->v_height, colorALUNull); }
+	else { 
+		if (selectedRegister == registerContainer->data) {
+			drawing.drawRect(registerContainer->v_position, registerContainer->v_width, registerContainer->v_height, colorRegisterSelected);  
+		}
+		else {
+			drawing.drawRect(registerContainer->v_position, registerContainer->v_width, registerContainer->v_height, colorRegister);  
+		}
+
+		if (registerContainer->label != " ") {
+			drawing.drawText(registerContainer->label.c_str(), registerContainer->v_position + Vector2((registerContainer->v_width / 4), 9), 1);
+			drawing.drawText(convertCharToHex(registerContainer->data), registerContainer->v_position + Vector2((registerContainer->v_width / 2) + 15, 9), 1);
+		}
+	}
+	drawing.drawRectOutline(registerContainer->v_position, registerContainer->v_width, registerContainer->v_height);
 }
