@@ -7,7 +7,7 @@ void Joiner::initialize() {
 }
 
 void Joiner::update() {
-	cPU.update();
+	cPU.update(timer.getTimeSeconds());
 }
 
 void Joiner::draw() {

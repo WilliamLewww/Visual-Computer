@@ -16,6 +16,8 @@ struct RegisterContainer {
 
 	char *data = nullptr;
 	std::string label = " ";
+
+	int region = -1;
 };
 
 struct InternalMemory {
@@ -53,6 +55,15 @@ private:
 
 	float velocityX, velocityY;
 
+	inline Vector2 getInternalMemoryPosition() { return v_position + internalMemory.v_position; };
+	inline Vector2 getALUPosition() { return v_position + aLU.v_position; }
+	inline Vector2 getRegisterContainerPosition(RegisterContainer* container) {
+		if (container->region == 0) { return v_position + internalMemory.v_position + container->v_position; }
+		if (container->region == 1) { return v_position + aLU.v_position + container->v_position; }
+
+		return Vector2();
+	};
+
 	int findIndexOfRegister(char* data);
 	void linkRegisterContainer(RegisterContainer* registerContainer, char* data);
 
@@ -68,7 +79,7 @@ public:
 
 	void manipulateALU();
 
-	void update();
+	void update(float elapsedTimeSeconds);
 	
 	void draw();
 	void drawInternalMemory();

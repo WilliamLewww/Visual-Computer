@@ -1,4 +1,5 @@
 #pragma once
+#include "core/timer.h"
 #include "cpu.h"
 
 class Joiner {
