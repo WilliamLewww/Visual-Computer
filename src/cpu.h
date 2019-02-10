@@ -15,7 +15,7 @@ struct RegisterContainer {
 	Vector2 v_position;
 	int v_width = 75, v_height = 20;
 
-	char *data = nullptr;
+	unsigned char *data = nullptr;
 	std::string label = " ";
 
 	int region = -1;
@@ -23,7 +23,7 @@ struct RegisterContainer {
 
 struct InternalMemory {
 	int registerCount;
-	char *registers;
+	unsigned char *registers;
 
 	Vector2 v_position;
 	int v_width = 75, v_height = 290;
@@ -32,9 +32,9 @@ struct InternalMemory {
 };
 
 struct ALU {
-	char *r1 = nullptr;
-	char *r2 = nullptr;
-	char *r3 = nullptr;
+	unsigned char *r1 = nullptr;
+	unsigned char *r2 = nullptr;
+	unsigned char *r3 = nullptr;
 	std::string numberInput = "";
 
 	int instruction = -1;
@@ -53,7 +53,7 @@ private:
 	InternalMemory internalMemory;
 	ALU aLU;
 
-	char* selectedRegister = nullptr;
+	unsigned char* selectedRegister = nullptr;
 
 	Vector2 v_position;
 	int v_width = 300, v_height = 300;
@@ -69,14 +69,14 @@ private:
 		return Vector2();
 	};
 
-	int findIndexOfRegister(char* data);
-	void linkRegisterContainer(RegisterContainer* registerContainer, char* data);
+	int findIndexOfRegister(unsigned char* data);
+	void linkRegisterContainer(RegisterContainer* registerContainer, unsigned char* data);
 
 	void resetRegisters();
 	void updateLabelALU();
 
 	void handleInternalMemory();
-	char* getClickInternalMemory();
+	unsigned char* getClickInternalMemory();
 
 	void handleALU();
 

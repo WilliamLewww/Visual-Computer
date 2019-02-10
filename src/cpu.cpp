@@ -7,7 +7,7 @@ int colorRegister[3] = { 150, 150, 150 };
 int colorRegisterNull[3] = { 25, 25, 25 };
 int colorRegisterSelected[3] = { 135, 181, 255 };
 
-const char* convertCharToHex(char* data) {
+const char* convertCharToHex(unsigned char* data) {
 	std::stringstream stream;
 	if ((int)*data < 16) { stream << "0x0" << std::hex << (int)*data; }
 	else { stream << "0x" << std::hex << (int)*data; }
@@ -19,7 +19,7 @@ CPU::CPU() {
 	v_position = Vector2(50, 50);
 
 	internalMemory.registerCount = 10;
-	internalMemory.registers = new char[internalMemory.registerCount];
+	internalMemory.registers = new unsigned char[internalMemory.registerCount];
 	resetRegisters();
 
 	internalMemory.registerContainer = new RegisterContainer[internalMemory.registerCount];
@@ -40,7 +40,7 @@ CPU::CPU() {
 	aLU.registerContainer[2].region = 1;
 }
 
-int CPU::findIndexOfRegister(char* data) {
+int CPU::findIndexOfRegister(unsigned char* data) {
 	for (int x = 0; x < internalMemory.registerCount; x++) {
 		if (data == &internalMemory.registers[x]) {
 			return x;
@@ -50,7 +50,7 @@ int CPU::findIndexOfRegister(char* data) {
 	return -1;
 }
 
-void CPU::linkRegisterContainer(RegisterContainer* registerContainer, char* data) {
+void CPU::linkRegisterContainer(RegisterContainer* registerContainer, unsigned char* data) {
 	registerContainer->data = data;
 	registerContainer->label = "$r" + std::to_string(findIndexOfRegister(data)) + ":";
 }
@@ -69,7 +69,7 @@ void CPU::manipulateALU() {
 
 void CPU::movALU() {
 	int count = 0;
-	char* validRegister = nullptr;
+	unsigned char* validRegister = nullptr;
 	if (aLU.r1 != nullptr) { count += 1; validRegister = aLU.r1; }
 	if (aLU.r2 != nullptr) { count += 1; validRegister = aLU.r2; }
 	if (aLU.r3 != nullptr) { count += 1; validRegister = aLU.r3; }
@@ -124,13 +124,13 @@ void CPU::handleInternalMemory() {
 	if (input.getLeftButtonPress() && input.getMouseX() > getInternalMemoryPosition().x && input.getMouseX() < getInternalMemoryPosition().x + internalMemory.v_width
 								   && input.getMouseY() > getInternalMemoryPosition().y && input.getMouseY() < getInternalMemoryPosition().y + internalMemory.v_height) {
 		
-		char* tempRegister = getClickInternalMemory();
+		unsigned char* tempRegister = getClickInternalMemory();
 		if (tempRegister != nullptr) { selectedRegister = tempRegister; }
 		else { selectedRegister = nullptr; }
 	}
 }
 
-char* CPU::getClickInternalMemory() {
+unsigned char* CPU::getClickInternalMemory() {
 	int tempIndex = (input.getMouseY() - getInternalMemoryPosition().y) / 20;
 	return &internalMemory.registers[tempIndex];
 }
