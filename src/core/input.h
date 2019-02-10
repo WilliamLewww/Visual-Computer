@@ -41,9 +41,11 @@ public:
 	inline bool getScrollDown() { return scrollDown; };
 	
 	bool checkKeyDown(SDL_Keycode Keycode);
+	bool checkKeyPress(SDL_Keycode Keycode);
 	bool checkButtonDown(int buttonCode);
 	int getControllerPadInput();
 	int getKeyListSize();
+	int getPressKeyListSize();
 
 	void getKeyTrigger(SDL_Event event);
 	void clearExpiredInput();

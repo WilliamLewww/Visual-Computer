@@ -62,8 +62,50 @@ void CPU::resetRegisters() {
 }
 
 void CPU::manipulateALU() {
-	if (aLU.instruction == INSTRUCTIONS_ADD) { *aLU.r3 = *aLU.r1 + *aLU.r2; }
-	if (aLU.instruction == INSTRUCTIONS_SUB) { *aLU.r3 = *aLU.r1 - *aLU.r2; }
+	if (aLU.instruction == INSTRUCTIONS_MOV) { movALU(); }
+	if (aLU.instruction == INSTRUCTIONS_ADD) { addALU(); }
+	if (aLU.instruction == INSTRUCTIONS_SUB) { subALU(); }
+}
+
+void CPU::movALU() {
+	int count = 0;
+	char* validRegister = nullptr;
+	if (aLU.r1 != nullptr) { count += 1; validRegister = aLU.r1; }
+	if (aLU.r2 != nullptr) { count += 1; validRegister = aLU.r2; }
+	if (aLU.r3 != nullptr) { count += 1; validRegister = aLU.r3; }
+
+	if (count == 1 && !aLU.numberInput.empty()) {
+		*validRegister = std::stoi(aLU.numberInput);
+		resetALU();
+	}
+}
+
+void CPU::addALU() {
+	if (aLU.numberInput.empty() && aLU.r1 != nullptr && aLU.r2 != nullptr && aLU.r3 != nullptr) {
+		*aLU.r3 = *aLU.r1 + *aLU.r2;
+		resetALU();
+	}
+}
+
+void CPU::subALU() {
+	if (aLU.numberInput.empty() && aLU.r1 != nullptr && aLU.r2 != nullptr && aLU.r3 != nullptr) {
+		*aLU.r3 = *aLU.r1 - *aLU.r2;
+		resetALU();
+	}
+}
+
+void CPU::resetALU() {
+	aLU.r1 = nullptr;
+	aLU.r2 = nullptr;
+	aLU.r3 = nullptr;
+	aLU.numberInput = "";
+	aLU.instruction = -1;
+
+	aLU.registerContainer[0].data = nullptr;
+	aLU.registerContainer[1].data = nullptr;
+	aLU.registerContainer[2].data = nullptr;
+
+	updateLabelALU();
 }
 
 void CPU::update(float elapsedTimeSeconds) {
@@ -107,6 +149,17 @@ void CPU::handleALU() {
 			aLU.instruction = 1;
 		}
 
+		if (input.getMouseX() > getALUPosition().x + 110 && input.getMouseX() < getALUPosition().x + 150 &&
+			input.getMouseY() > getALUPosition().y + 120 && input.getMouseY() < getALUPosition().y + 140) {
+			aLU.instruction = 2;
+		}
+
+		if (input.getMouseX() > getALUPosition().x + 170 && input.getMouseX() < getALUPosition().x + 190 &&
+			input.getMouseY() > getALUPosition().y + 120 && input.getMouseY() < getALUPosition().y + 140) {
+			manipulateALU();
+			aLU.activation = true;
+		}
+
 		if (input.getMouseX() > getALUPosition().x + 10 && input.getMouseX() < getALUPosition().x + 85 &&
 			input.getMouseY() > getALUPosition().y + 10 && input.getMouseY() < getALUPosition().y + 30) {
 			if (selectedRegister != nullptr) {
@@ -138,6 +191,21 @@ void CPU::handleALU() {
 		}
 
 		updateLabelALU();
+	}
+
+	if (input.getPressKeyListSize() > 0) {
+		if (input.checkKeyPress(SDLK_1)) { aLU.numberInput += '1'; updateLabelALU(); }
+		if (input.checkKeyPress(SDLK_2)) { aLU.numberInput += '2'; updateLabelALU(); }
+		if (input.checkKeyPress(SDLK_3)) { aLU.numberInput += '3'; updateLabelALU(); }
+		if (input.checkKeyPress(SDLK_4)) { aLU.numberInput += '4'; updateLabelALU(); }
+		if (input.checkKeyPress(SDLK_5)) { aLU.numberInput += '5'; updateLabelALU(); }
+		if (input.checkKeyPress(SDLK_6)) { aLU.numberInput += '6'; updateLabelALU(); }
+		if (input.checkKeyPress(SDLK_7)) { aLU.numberInput += '7'; updateLabelALU(); }
+		if (input.checkKeyPress(SDLK_8)) { aLU.numberInput += '8'; updateLabelALU(); }
+		if (input.checkKeyPress(SDLK_9)) { aLU.numberInput += '9'; updateLabelALU(); }
+		if (input.checkKeyPress(SDLK_0)) { aLU.numberInput += '0'; updateLabelALU(); }
+
+		if (input.checkKeyPress(SDLK_BACKSPACE) && !aLU.numberInput.empty()) { aLU.numberInput.pop_back(); updateLabelALU(); }
 	}
 }
 
@@ -173,20 +241,31 @@ void CPU::drawALU() {
 	if (aLU.instruction == 0) { drawing.drawRect(getALUPosition() + Vector2(10, 120), 40, 20, colorRegisterSelected); }
 	else { drawing.drawRect(getALUPosition() + Vector2(10, 120), 40, 20, colorRegister); }
 	drawing.drawRectOutline(getALUPosition() + Vector2(10, 120), 40, 20);
-	drawing.drawText("add", getALUPosition() + Vector2(30, 130), 1);
+	drawing.drawText("mov", getALUPosition() + Vector2(30, 130), 1);
 
-	if (aLU.instruction == 1) { drawing.drawRect(getALUPosition() + Vector2(60, 120), 40, 20, colorRegisterSelected);	}
+	if (aLU.instruction == 1) { drawing.drawRect(getALUPosition() + Vector2(60, 120), 40, 20, colorRegisterSelected); }
 	else { drawing.drawRect(getALUPosition() + Vector2(60, 120), 40, 20, colorRegister); }
 	drawing.drawRectOutline(getALUPosition() + Vector2(60, 120), 40, 20);
-	drawing.drawText("sub", getALUPosition() + Vector2(80, 130), 1);
+	drawing.drawText("add", getALUPosition() + Vector2(80, 130), 1);
+
+	if (aLU.instruction == 2) { drawing.drawRect(getALUPosition() + Vector2(110, 120), 40, 20, colorRegisterSelected);	}
+	else { drawing.drawRect(getALUPosition() + Vector2(110, 120), 40, 20, colorRegister); }
+	drawing.drawRectOutline(getALUPosition() + Vector2(110, 120), 40, 20);
+	drawing.drawText("sub", getALUPosition() + Vector2(130, 130), 1);
+
+	if (aLU.activation) { drawing.drawRect(getALUPosition() + Vector2(170, 120), 20, 20, colorRegisterSelected); aLU.activation = false; }
+	else { drawing.drawRect(getALUPosition() + Vector2(170, 120), 20, 20, colorRegister); }
+	drawing.drawRectOutline(getALUPosition() + Vector2(170, 120), 20, 20);
+	drawing.drawText("=", getALUPosition() + Vector2(180, 130), 1);
 }
 
 void CPU::updateLabelALU() {
 	aLU.label.clear();
 
 	switch (aLU.instruction) {
-		case 0: aLU.label += "add   "; break;
-		case 1: aLU.label += "sub"; break;
+		case 0: aLU.label += "mov   "; break;
+		case 1: aLU.label += "add   "; break;
+		case 2: aLU.label += "sub   "; break;
 	}
 
 	bool addComma = false;
@@ -198,7 +277,12 @@ void CPU::updateLabelALU() {
 	}
 	if (aLU.r2 != nullptr) { 
 		if (addComma) { aLU.label += ","; addComma = false; }
-		aLU.label += "$r"; aLU.label.push_back(findIndexOfRegister(aLU.r2) + '0'); 
+		aLU.label += "$r"; aLU.label.push_back(findIndexOfRegister(aLU.r2) + '0'); addComma = true;
+	}
+
+	if (!aLU.numberInput.empty()) {
+		if (addComma) { aLU.label += ","; addComma = false; }
+		aLU.label += aLU.numberInput;
 	}
 
 	if (aLU.label.empty()) { aLU.label = " "; }

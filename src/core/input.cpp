@@ -10,8 +10,20 @@ int Input::getKeyListSize() {
 	return keyList.size();
 }
 
+int Input::getPressKeyListSize() {
+	return pressKeyList.size();
+}
+
 bool Input::checkKeyDown(SDL_Keycode Keycode) {
 	if (std::find(keyList.begin(), keyList.end(), Keycode) != keyList.end()) {
+		return true;
+	}
+
+	return false;
+}
+
+bool Input::checkKeyPress(SDL_Keycode Keycode) {
+	if (std::find(pressKeyList.begin(), pressKeyList.end(), Keycode) != pressKeyList.end()) {
 		return true;
 	}
 

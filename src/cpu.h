@@ -6,6 +6,7 @@
 #include "core/input.h"
 
 enum INSTRUCTIONS {
+	INSTRUCTIONS_MOV = 0,
 	INSTRUCTIONS_ADD = 1,
 	INSTRUCTIONS_SUB = 2
 };
@@ -34,7 +35,11 @@ struct ALU {
 	char *r1 = nullptr;
 	char *r2 = nullptr;
 	char *r3 = nullptr;
+	std::string numberInput = "";
+
 	int instruction = -1;
+
+	bool activation = false;
 
 	Vector2 v_position;
 	int v_width = 200, v_height = 150;
@@ -74,6 +79,12 @@ private:
 	char* getClickInternalMemory();
 
 	void handleALU();
+
+	void movALU();
+	void addALU();
+	void subALU();
+
+	void resetALU();
 public:
 	CPU();
 
