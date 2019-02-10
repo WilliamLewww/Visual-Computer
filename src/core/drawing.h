@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <sstream>
 #include <SDL2\SDL_opengl.h>
 #include <SDL2\SDL_ttf.h>
 #include "vector2.h"
@@ -18,6 +19,8 @@ public:
 	inline double degreeToRadians(double degree) {
 		return (degree * (PI / 180.0));
 	}
+
+	const char* convertCharToHex(unsigned char* data);
 
 	void drawText(const char* message, Vector2 position, int index);
 	void drawText(const char* message, Vector2 position, int index, int color[3]);

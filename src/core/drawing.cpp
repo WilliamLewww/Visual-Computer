@@ -10,6 +10,14 @@ double Drawing::convertColorFloatToRGB(double rgbValue) {
 	return (double)rgbValue / 255;
 }
 
+const char* Drawing::convertCharToHex(unsigned char* data) {
+	std::stringstream stream;
+	if ((int)*data < 16) { stream << "0x0" << std::hex << (int)*data; }
+	else { stream << "0x" << std::hex << (int)*data; }
+
+	return stream.str().c_str();
+}
+
 void Drawing::drawText(const char* message, Vector2 position, int index) {
 	Vector2 vectors[4]{
 		Vector2(0, 0),

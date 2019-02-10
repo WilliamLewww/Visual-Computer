@@ -7,14 +7,6 @@ int colorRegister[3] = { 150, 150, 150 };
 int colorRegisterNull[3] = { 25, 25, 25 };
 int colorRegisterSelected[3] = { 135, 181, 255 };
 
-const char* convertCharToHex(unsigned char* data) {
-	std::stringstream stream;
-	if ((int)*data < 16) { stream << "0x0" << std::hex << (int)*data; }
-	else { stream << "0x" << std::hex << (int)*data; }
-
-	return stream.str().c_str();
-}
-
 CPU::CPU() {
 	v_position = Vector2(50, 50);
 
@@ -70,16 +62,16 @@ void CPU::manipulateALU() {
 void CPU::movALU() {
 	int count = 0;
 	unsigned char *validRegister = nullptr, *validRegisterB = nullptr;
-	if (aLU.r1 != nullptr) { count += 1; validRegister = aLU.r1; }
+	if (aLU.r3 != nullptr) { count += 1; validRegister = aLU.r3; }
+	if (aLU.r1 != nullptr) { 
+		count += 1;
+		if (validRegister != nullptr) { validRegisterB = aLU.r1; } 
+		else { validRegister = aLU.r1; }
+	}
 	if (aLU.r2 != nullptr) { 
 		count += 1; 
 		if (validRegister != nullptr) { validRegisterB = aLU.r2; } 
 		else { validRegister = aLU.r2; }
-	}
-	if (aLU.r3 != nullptr) { 
-		count += 1; 
-		if (validRegister != nullptr) { validRegisterB = aLU.r3; } 
-		else { validRegister = aLU.r3; }
 	}
 
 	if (count == 1 && !aLU.numberInput.empty()) {
@@ -89,6 +81,7 @@ void CPU::movALU() {
 
 	if (count == 2 && aLU.numberInput.empty()) {
 		*validRegister = *validRegisterB;
+		resetALU();
 	}
 }
 
@@ -323,7 +316,7 @@ void CPU::drawRegisterContainer(RegisterContainer* registerContainer) {
 
 		if (registerContainer->label != " ") {
 			drawing.drawText(registerContainer->label.c_str(), getRegisterContainerPosition(registerContainer) + Vector2((registerContainer->v_width / 4), 9), 1);
-			drawing.drawText(convertCharToHex(registerContainer->data), getRegisterContainerPosition(registerContainer) + Vector2((registerContainer->v_width / 2) + 15, 9), 1);
+			drawing.drawText(drawing.convertCharToHex(registerContainer->data), getRegisterContainerPosition(registerContainer) + Vector2((registerContainer->v_width / 2) + 15, 9), 1);
 		}
 	}
 	drawing.drawRectOutline(getRegisterContainerPosition(registerContainer), registerContainer->v_width, registerContainer->v_height);

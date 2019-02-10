@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <sstream>
 #include "core/vector2.h"
 #include "core/drawing.h"
 #include "core/input.h"
