@@ -69,14 +69,26 @@ void CPU::manipulateALU() {
 
 void CPU::movALU() {
 	int count = 0;
-	unsigned char* validRegister = nullptr;
+	unsigned char *validRegister = nullptr, *validRegisterB = nullptr;
 	if (aLU.r1 != nullptr) { count += 1; validRegister = aLU.r1; }
-	if (aLU.r2 != nullptr) { count += 1; validRegister = aLU.r2; }
-	if (aLU.r3 != nullptr) { count += 1; validRegister = aLU.r3; }
+	if (aLU.r2 != nullptr) { 
+		count += 1; 
+		if (validRegister != nullptr) { validRegisterB = aLU.r2; } 
+		else { validRegister = aLU.r2; }
+	}
+	if (aLU.r3 != nullptr) { 
+		count += 1; 
+		if (validRegister != nullptr) { validRegisterB = aLU.r3; } 
+		else { validRegister = aLU.r3; }
+	}
 
 	if (count == 1 && !aLU.numberInput.empty()) {
 		*validRegister = std::stoi(aLU.numberInput);
 		resetALU();
+	}
+
+	if (count == 2 && aLU.numberInput.empty()) {
+		*validRegister = *validRegisterB;
 	}
 }
 
@@ -113,8 +125,19 @@ void CPU::update(float elapsedTimeSeconds) {
 	handleALU();
 
 	velocityX = 0;
-	if (input.checkKeyDown(SDLK_RIGHT) && !input.checkKeyDown(SDLK_LEFT)) { velocityX = 100; }
-	if (input.checkKeyDown(SDLK_LEFT) && !input.checkKeyDown(SDLK_RIGHT)) { velocityX = -100; }
+	if (input.checkKeyDown(SDLK_RIGHT) && !input.checkKeyDown(SDLK_LEFT) && (v_position.x + v_width < configuration.getScreenWidth())) { velocityX = 250; }
+	if (input.checkKeyDown(SDLK_LEFT) && !input.checkKeyDown(SDLK_RIGHT) && (v_position.x > 0)) { velocityX = -250; }
+
+	if (v_position.y + v_height < configuration.getScreenHeight()) { 
+		if (!input.checkKeyDown(SDLK_SPACE) && velocityY < 0) { velocityY += 19.6; }
+		else { velocityY += 9.8; }
+	}
+	else { 
+		velocityY = 0; 
+		v_position.y = configuration.getScreenHeight() - v_height;
+
+		if (input.checkKeyPress(SDLK_SPACE)) { velocityY = -500; }
+	}
 
 	v_position.x += velocityX * elapsedTimeSeconds;
 	v_position.y += velocityY * elapsedTimeSeconds;

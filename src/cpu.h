@@ -4,6 +4,7 @@
 #include "core/vector2.h"
 #include "core/drawing.h"
 #include "core/input.h"
+#include "core/configuration.h"
 
 enum INSTRUCTIONS {
 	INSTRUCTIONS_MOV = 0,
