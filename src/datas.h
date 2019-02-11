@@ -10,6 +10,7 @@ private:
 	unsigned char data;
 
 	float velocityX, velocityY;
+	bool alive = true;
 public:
 	inline Vector2 center() { return Vector2(position.x + (width / 2), position.y + (height / 2)); }
 	inline double top() { return position.y; }
@@ -18,6 +19,9 @@ public:
 	inline double right() { return position.x + width; }
 
 	inline unsigned char getData() { return data; };
+
+	inline bool getAlive() { return alive; };
+	inline void setAlive(bool alive) { this->alive = alive; };
 
 	Datas(Vector2 position, unsigned char data);
 	void update(float elapsedTimeSeconds);

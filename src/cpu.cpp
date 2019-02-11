@@ -140,15 +140,12 @@ void CPU::update(float elapsedTimeSeconds) {
 	}
 
 	if (groundDatas.size() > 0) {
-		std::vector<Datas*> tempDatas;
-		for (Datas* datas : groundDatas) {
-			if (!checkCollision(*datas)) { tempDatas.push_back(datas); }
+		for (int x = 0; x < groundDatas.size(); x++) {
+			if (!checkCollision(*groundDatas[x])) { 
+				groundDatas.erase(groundDatas.begin() + x);
+				x -= 1;
+			}
 		}
-
-		for (Datas* datas : tempDatas) {
-			groundDatas.erase(std::remove(groundDatas.begin(), groundDatas.end(), datas), groundDatas.end());
-		}
-		tempDatas.clear();
 	}
 
 	if (groundDatas.size() == 0 && bottom() < configuration.getScreenHeight()) {
@@ -365,10 +362,11 @@ void CPU::handleCollision(Datas& datas) {
 				}
 			}
 			else {
-				if (velocityY < 0) {
-					v_position.y += overlapY; 
-					velocityY = 0;
-				}
+				datas.setAlive(false);
+				// if (velocityY < 0) {
+				// 	v_position.y += overlapY; 
+				// 	velocityY = 0;
+				// }
 			}
 		}
 		else {

@@ -16,11 +16,17 @@ void Joiner::update() {
 	handleDatas();
 
 	cPU.update(timer.getTimeSeconds());
-	for (Datas& datas : datasList) { 
-		datas.update(timer.getTimeSeconds());
 
-		if (cPU.checkCollision(datas)) {
-			cPU.handleCollision(datas);
+	for (int x = 0; x < datasList.size(); x++) {
+		datasList[x].update(timer.getTimeSeconds());
+
+		if (cPU.checkCollision(datasList[x])) {
+			cPU.handleCollision(datasList[x]);
+		}
+
+		if (!datasList[x].getAlive()) {
+			datasList.erase(datasList.begin() + x);
+			x -= 1;
 		}
 	}
 }
