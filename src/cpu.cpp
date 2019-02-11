@@ -118,8 +118,8 @@ void CPU::update(float elapsedTimeSeconds) {
 	handleALU();
 
 	velocityX = 0;
-	if (input.checkKeyDown(SDLK_RIGHT) && !input.checkKeyDown(SDLK_LEFT) && (v_position.x + v_width < configuration.getScreenWidth())) { velocityX = 250; }
-	if (input.checkKeyDown(SDLK_LEFT) && !input.checkKeyDown(SDLK_RIGHT) && (v_position.x > 0)) { velocityX = -250; }
+	if (input.checkKeyDown(SDLK_RIGHT) && !input.checkKeyDown(SDLK_LEFT) && (v_position.x + v_width < configuration.getScreenWidth())) { velocityX = 300; }
+	if (input.checkKeyDown(SDLK_LEFT) && !input.checkKeyDown(SDLK_RIGHT) && (v_position.x > 0)) { velocityX = -300; }
 
 	if (v_position.y + v_height < configuration.getScreenHeight()) { 
 		if (!input.checkKeyDown(SDLK_SPACE) && velocityY < 0) { velocityY += 19.6; }

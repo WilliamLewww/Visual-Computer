@@ -88,6 +88,9 @@ private:
 public:
 	CPU();
 
+	inline unsigned char getRegister(int index) { return internalMemory.registers[index]; }
+	inline unsigned char* getRegisterAddr(int index) { return &internalMemory.registers[index]; }
+
 	void manipulateALU();
 
 	void update(float elapsedTimeSeconds);
