@@ -1,6 +1,7 @@
 #pragma once
 #include <random>
 #include <vector>
+#include <algorithm> 
 #include "core/timer.h"
 #include "core/configuration.h"
 #include "cpu.h"

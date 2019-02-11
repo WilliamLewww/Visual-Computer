@@ -321,3 +321,12 @@ void CPU::drawRegisterContainer(RegisterContainer* registerContainer) {
 	}
 	drawing.drawRectOutline(getRegisterContainerPosition(registerContainer), registerContainer->v_width, registerContainer->v_height);
 }
+
+bool CPU::checkCollision(Datas datas) {
+	if (right() >= datas.left() && left() <= datas.right() && bottom() >= datas.top() && top() <= datas.bottom()) { return true; }
+	return false;
+}
+
+void CPU::handleCollision(Datas& datas) {
+
+}

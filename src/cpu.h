@@ -4,6 +4,7 @@
 #include "core/drawing.h"
 #include "core/input.h"
 #include "core/configuration.h"
+#include "datas.h"
 
 enum INSTRUCTIONS {
 	INSTRUCTIONS_MOV = 0,
@@ -86,7 +87,16 @@ private:
 
 	void resetALU();
 public:
+	inline Vector2 center() { return Vector2(v_position.x + (v_width / 2), v_position.y + (v_height / 2)); }
+	inline double top() { return v_position.y; }
+	inline double bottom() { return v_position.y + v_height; }
+	inline double left() { return v_position.x; }
+	inline double right() { return v_position.x + v_width; }
+	
 	CPU();
+
+	bool checkCollision(Datas datas);
+	void handleCollision(Datas& datas);
 
 	inline unsigned char getRegister(int index) { return internalMemory.registers[index]; }
 	inline unsigned char* getRegisterAddr(int index) { return &internalMemory.registers[index]; }
