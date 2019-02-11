@@ -59,7 +59,10 @@ private:
 	Vector2 v_position;
 	int v_width = 300, v_height = 300;
 
-	float velocityX, velocityY;
+	std::vector<Datas*> groundDatas;
+	bool onGround = false;
+
+	float velocityX = 0.0, velocityY = 0.0;
 
 	inline Vector2 getInternalMemoryPosition() { return v_position + internalMemory.v_position; };
 	inline Vector2 getALUPosition() { return v_position + aLU.v_position; }
@@ -92,7 +95,7 @@ public:
 	inline double bottom() { return v_position.y + v_height; }
 	inline double left() { return v_position.x; }
 	inline double right() { return v_position.x + v_width; }
-	
+
 	CPU();
 
 	bool checkCollision(Datas datas);

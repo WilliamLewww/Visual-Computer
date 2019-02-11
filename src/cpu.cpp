@@ -114,6 +114,9 @@ void CPU::resetALU() {
 }
 
 void CPU::update(float elapsedTimeSeconds) {
+	v_position.x += velocityX * elapsedTimeSeconds;
+	v_position.y += velocityY * elapsedTimeSeconds;
+
 	handleInternalMemory();
 	handleALU();
 
@@ -121,19 +124,36 @@ void CPU::update(float elapsedTimeSeconds) {
 	if (input.checkKeyDown(SDLK_RIGHT) && !input.checkKeyDown(SDLK_LEFT) && (v_position.x + v_width < configuration.getScreenWidth())) { velocityX = 300; }
 	if (input.checkKeyDown(SDLK_LEFT) && !input.checkKeyDown(SDLK_RIGHT) && (v_position.x > 0)) { velocityX = -300; }
 
-	if (v_position.y + v_height < configuration.getScreenHeight()) { 
+	if (onGround) {
+		velocityY = 0; 
+		if (input.checkKeyPress(SDLK_SPACE)) { velocityY = -500; onGround = false; }
+	}
+	else {
 		if (!input.checkKeyDown(SDLK_SPACE) && velocityY < 0) { velocityY += 19.6; }
 		else { velocityY += 9.8; }
-	}
-	else { 
-		velocityY = 0; 
-		v_position.y = configuration.getScreenHeight() - v_height;
 
-		if (input.checkKeyPress(SDLK_SPACE)) { velocityY = -500; }
+		if (bottom() > configuration.getScreenHeight()) {
+			velocityY = 0;
+			v_position.y = configuration.getScreenHeight() - v_height;
+			onGround = true;
+		}
 	}
 
-	v_position.x += velocityX * elapsedTimeSeconds;
-	v_position.y += velocityY * elapsedTimeSeconds;
+	if (groundDatas.size() > 0) {
+		std::vector<Datas*> tempDatas;
+		for (Datas* datas : groundDatas) {
+			if (!checkCollision(*datas)) { tempDatas.push_back(datas); }
+		}
+
+		for (Datas* datas : tempDatas) {
+			groundDatas.erase(std::remove(groundDatas.begin(), groundDatas.end(), datas), groundDatas.end());
+		}
+		tempDatas.clear();
+	}
+
+	if (groundDatas.size() == 0 && bottom() < configuration.getScreenHeight()) {
+		onGround = false;
+	}
 }
 
 void CPU::handleInternalMemory() {
@@ -328,5 +348,32 @@ bool CPU::checkCollision(Datas datas) {
 }
 
 void CPU::handleCollision(Datas& datas) {
+	double overlapX, overlapY;
+	if (center().x > datas.center().x) { overlapX = datas.right() - left(); }
+	else { overlapX = -(right() - datas.left()); }
+	if (center().y > datas.center().y) { overlapY = datas.bottom() - top(); }
+	else { overlapY = -(bottom() - datas.top()); }
 
+	if (overlapX != 0 && overlapY != 0) {
+		if (abs(overlapY) < abs(overlapX)) {
+			if (overlapY < 0) {
+				if (velocityY > 0) {
+					onGround = true;
+					v_position.y += overlapY; 
+					velocityY = 0;
+					groundDatas.push_back(&datas);
+				}
+			}
+			else {
+				if (velocityY < 0) {
+					v_position.y += overlapY; 
+					velocityY = 0;
+				}
+			}
+		}
+		else {
+			v_position.x += overlapX; 
+			velocityX = 0;
+		}
+	}
 }

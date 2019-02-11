@@ -9,7 +9,7 @@ void Joiner::initialize() {
 	datasCount = cPU.getRegisterAddr(0);
 	datasInterval = cPU.getRegisterAddr(1);
 
-	datasList.emplace_back(Vector2(-50, -50), 0);
+	datasList.emplace_back(Vector2(-configuration.getScreenWidth(), -configuration.getScreenHeight()), 0);
 }
 
 void Joiner::update() {
@@ -45,8 +45,6 @@ void Joiner::handleDatas() {
 			datasTimer = 0.0;
 			*datasCount -= 1;
 		}
-		else {
-			datasTimer += timer.getTimeSeconds();
-		}
+		else { datasTimer += timer.getTimeSeconds(); }
 	}
 }
