@@ -9,7 +9,7 @@ void Joiner::initialize() {
 	datasCount = cPU.getRegisterAddr(0);
 	datasInterval = cPU.getRegisterAddr(1);
 
-	datasList.emplace_back(Vector2(-configuration.getScreenWidth(), -configuration.getScreenHeight()), 0);
+	datasList.emplace_back(Vector2(configuration.getScreenWidth() - 200, configuration.getScreenHeight() - 200), 7);
 }
 
 void Joiner::update() {

@@ -51,6 +51,12 @@ void CPU::resetRegisters() {
 	for (int x = 0; x < internalMemory.registerCount; x++) {
 		internalMemory.registers[x] = 0;
 	}
+
+	internalMemory.registers[1] = initialDataInterval;
+
+	internalMemory.registers[3] = initialCrunchInterval;
+	crunchTimer = initialCrunchInterval;
+	internalMemory.registers[4] = initialCrunchInterval;
 }
 
 void CPU::manipulateALU() {
@@ -147,6 +153,21 @@ void CPU::update(float elapsedTimeSeconds) {
 			}
 		}
 	}
+
+	if (crunchTimer <= 0) {
+		if (input.checkKeyPress(SDLK_DOWN) && groundDatas.size() == 1) {
+			groundDatas[0]->setAlive(false);
+			internalMemory.registers[2] += groundDatas[0]->getData();
+			crunchTimer = internalMemory.registers[4];
+			groundDatas.erase(groundDatas.begin());
+		}
+	}
+	else {
+		if (crunchTimer - elapsedTimeSeconds <= 0) { crunchTimer = 0; }
+		else { crunchTimer -= elapsedTimeSeconds; }
+	}
+
+	internalMemory.registers[3] = ceil(crunchTimer);
 
 	if (groundDatas.size() == 0 && bottom() < configuration.getScreenHeight()) {
 		onGround = false;

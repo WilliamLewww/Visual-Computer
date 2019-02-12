@@ -64,6 +64,11 @@ private:
 
 	float velocityX = 0.0, velocityY = 0.0;
 
+	float crunchTimer;
+
+	int initialDataInterval = 3;
+	int initialCrunchInterval = 5;
+
 	inline Vector2 getInternalMemoryPosition() { return v_position + internalMemory.v_position; };
 	inline Vector2 getALUPosition() { return v_position + aLU.v_position; }
 	inline Vector2 getRegisterContainerPosition(RegisterContainer* container) {
